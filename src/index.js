@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const path = require("path");
 const { spawn, execFile } = require("child_process");
 const fs = require("fs-extra");
@@ -24,9 +26,31 @@ const encode = () => {
         vf.push(...rotate);
     }
 
-    const vfParam = [];
+    const optionalParams = [];
     if (vf.length) {
-        vfParam.push("-vf", vf.join(","));
+        optionalParams.push("-vf", vf.join(","));
+    }
+
+    if (program["v:fps"]) {
+        optionalParams.push("-r", program["v:fps"]);
+    }
+
+    if (program["a:channels"]) {
+        optionalParams.push("-ac", program["a:channels"]);
+    }
+
+    if (program["a:copy"]) {
+        optionalParams.push("-c:a", "copy");
+    }
+    else if (program["a:none"]) {
+        optionalParams.push("-an");
+    }
+    else {
+        optionalParams.push("-c:a", "aac");
+    }
+
+    if (program["a:bitrate"]) {
+        optionalParams.push("-b:a", program["a:bitrate"]);
     }
 
     return new Promise((resolve, reject) => {
@@ -36,10 +60,7 @@ const encode = () => {
             "-c:v", "libx264",
             "-preset", program["v:preset"],
             "-crf", program["v:quality"],
-            ...vfParam,
-            "-ac", program["a:channels"],
-            "-c:a", "aac",
-            "-b:a", program["a:bitrate"],
+            ...optionalParams,
             "-tune", "zerolatency",
             "-movflags", "+faststart",
             outputFileName,

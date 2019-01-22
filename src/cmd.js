@@ -43,7 +43,6 @@ module.exports = () => {
         program.version(packageJson.version, '-v, --version')
             .arguments("<file>")
             .option("-i, --input <path>", "source file to encode", filePath)
-            .option("--a:channels <number>", "sets audio channels count", number, 1)
             .option(
                 "--v:quality <number>",
                 "sets video quality (0-51, where 0 is lossless, 17 is visually lossless, 23 is optimal default)",
@@ -51,27 +50,34 @@ module.exports = () => {
                 23,
             )
             .option(
+                "--v:fps <number>",
+                "sets output video framerate",
+                number,
+            )
+            .option(
                 "--v:rotate <degrees>",
                 "rotates video, only `90`, `180`, `270` are valid values",
                 rotate,
-            )
-            .option(
-                "--a:bitrate <number>",
-                "sets audio quality (in kbps)",
-                kbps,
-                "128k",
             )
             .option(
                 "--v:preset <preset>",
                 "sets video encoding preset", // @todo list presets as validation
                 "slow",
             )
+            .option("--a:copy", "copies source audio")
+            .option("--a:none", "disables audio")
+            .option("--a:channels <number>", "sets audio channels count", number)
+            .option(
+                "--a:bitrate <number>",
+                "sets audio quality (in kbps)",
+                kbps,
+            )
             .parse(process.argv)
         ;
     }
     catch (e) {
         if (e instanceof ArgumentError) {
-            console.error(e.message);
+            console.error("error:", e.message);
             process.exit(1);
         }
 
@@ -83,6 +89,24 @@ module.exports = () => {
     if (!program.input) {
         console.error("error: required option `-i, --input <path>` missing");
         process.exit(1);
+    }
+
+    if (program["a:copy"]) {
+        if (program["a:bitrate"] || program["a:channels"]) {
+            console.error("error: you can't configure audio settings if you set to copy it");
+            process.exit(1);
+        }
+        if (program["a:none"]) {
+            console.error("error: you can't disable audio if you set to copy it");
+            process.exit(1);
+        }
+    }
+
+    if (program["a:none"]) {
+        if (program["a:bitrate"] || program["a:channels"]) {
+            console.error("error: you can't configure audio settings if you disabled");
+            process.exit(1);
+        }
     }
 
     return program;

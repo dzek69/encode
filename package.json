@@ -1,6 +1,9 @@
 {
   "name": "@dzek69/encode",
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "bin": {
+    "encode": "src/index.js"
+  },
   "description": "Helps you encode your video files",
   "main": "src/index.js",
   "repository": "ssh://repo2.mydevil.net/home/dzek/repo/git/priv/encode",
