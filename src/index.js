@@ -61,6 +61,7 @@ const encode = () => {
             "-preset", program["v:preset"],
             "-crf", program["v:quality"],
             ...optionalParams,
+            "-vsync", "2",
             "-tune", "zerolatency",
             "-movflags", "+faststart",
             outputFileName,
