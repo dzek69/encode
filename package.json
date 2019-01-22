@@ -1,0 +1,15 @@
+{
+  "name": "@dzek69/encode",
+  "version": "1.0.0",
+  "description": "Helps you encode your video files",
+  "main": "src/index.js",
+  "repository": "ssh://repo2.mydevil.net/home/dzek/repo/git/priv/encode",
+  "author": "dzek69 <git-public@dzek.eu>",
+  "license": "MIT",
+  "dependencies": {
+    "better-custom-error": "^1.0.0",
+    "commander": "^2.19.0",
+    "fs-extra": "^7.0.1",
+    "pretty-bytes": "^5.1.0"
+  }
+}
