@@ -10,6 +10,10 @@ const number = (value) => {
     return parseInt(value, 10);
 };
 
+const float = (value) => {
+    return parseFloat(value);
+};
+
 const kbps = (value) => {
     return value + "k";
 };
@@ -52,7 +56,7 @@ module.exports = () => {
             .option(
                 "--v:fps <number>",
                 "sets output video framerate",
-                number,
+                float,
             )
             .option(
                 "--v:rotate <degrees>",
