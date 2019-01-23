@@ -22,6 +22,7 @@ const rotateMap = {
     90: "transpose=1",
     180: ["transpose=2", "transpose=2"],
     270: "transpose=2",
+    "-90": "transpose=2",
 };
 
 const rotate = (value) => {
@@ -62,6 +63,10 @@ module.exports = () => {
                 "--v:rotate <degrees>",
                 "rotates video, only `90`, `180`, `270` are valid values",
                 rotate,
+            )
+            .option(
+                "--v:scale <degrees>",
+                "scales video, feed it with raw ffmpeg `scale` `vf`, basic example: 1280x720, 1280:-1, -1:720",
             )
             .option(
                 "--v:preset <preset>",

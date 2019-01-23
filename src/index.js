@@ -4,6 +4,7 @@ const path = require("path");
 const { spawn, execFile } = require("child_process");
 const fs = require("fs-extra");
 const pretty = require("pretty-bytes");
+const colors = require("colors/safe");
 
 const cmd = require("./cmd");
 
@@ -24,6 +25,10 @@ const encode = () => {
     if (program["v:rotate"]) {
         const rotate = makeArray(program["v:rotate"]);
         vf.push(...rotate);
+    }
+
+    if (program["v:scale"]) {
+        vf.push("scale=" + program["v:scale"]);
     }
 
     const optionalParams = [];
@@ -66,6 +71,7 @@ const encode = () => {
             "-movflags", "+faststart",
             outputFileName,
         ]);
+        console.info(colors.green(ff.spawnargs.join(" ")));
         let lastError = "";
         ff.stdout.on("data", data => console.log(String(data)));
         ff.stderr.on("data", data => {
