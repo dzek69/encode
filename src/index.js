@@ -54,8 +54,12 @@ const encode = () => {
         optionalParams.push("-c:a", "aac");
     }
 
-    if (program["a:bitrate"]) {
-        optionalParams.push("-b:a", program["a:bitrate"]);
+    if (program["from"]) {
+        optionalParams.push("-ss", program["from"]);
+    }
+
+    if (program["to"]) {
+        optionalParams.push("-to", program["to"]);
     }
 
     return new Promise((resolve, reject) => {

@@ -81,6 +81,14 @@ module.exports = () => {
                 "sets audio quality (in kbps)",
                 kbps,
             )
+            .option(
+                "--from <string>",
+                "cuts video from this time",
+            )
+            .option(
+                "--to <string>",
+                "cuts video to this time",
+            )
             .parse(process.argv)
         ;
     }

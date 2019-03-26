@@ -1,6 +1,6 @@
 {
   "name": "@dzek69/encode",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "bin": {
     "encode": "src/index.js"
   },
