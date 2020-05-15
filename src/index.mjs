@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 
-const path = require("path");
-const { spawn, execFile } = require("child_process");
-const fs = require("fs-extra");
-const pretty = require("pretty-bytes");
-const colors = require("colors/safe");
+import path from "path";
+import { spawn, execFile } from "child_process";
+import fs from "fs-extra";
+import pretty from "pretty-bytes";
+import colors from "colors/safe.js";
 
-const cmd = require("./cmd");
+import cmd from "./cmd.mjs";
 
 const program = cmd();
 const inputFileName = path.basename(program.input);
 const inputFileNameParts = inputFileName.split(".");
-// const inputFileExt = inputFileNameParts.pop();
 inputFileNameParts.pop();
 const inputFileNameWithoutExt = inputFileNameParts.join(".");
 const outputFileName = inputFileNameWithoutExt + ".encoded.mp4";
@@ -20,7 +19,7 @@ const makeArray = (value) => {
     return Array.isArray(value) ? value : [value];
 };
 
-const encode = () => {
+const buildOptionalParams = () => { // eslint-disable-line max-statements
     const vf = [];
     if (program["v:rotate"]) {
         const rotate = makeArray(program["v:rotate"]);
@@ -54,13 +53,19 @@ const encode = () => {
         optionalParams.push("-c:a", "aac");
     }
 
-    if (program["from"]) {
-        optionalParams.push("-ss", program["from"]);
+    if (program.from) {
+        optionalParams.push("-ss", program.from);
     }
 
-    if (program["to"]) {
-        optionalParams.push("-to", program["to"]);
+    if (program.to) {
+        optionalParams.push("-to", program.to);
     }
+
+    return optionalParams;
+};
+
+const encode = () => {
+    const optionalParams = buildOptionalParams();
 
     return new Promise((resolve, reject) => {
         const ff = spawn("ffmpeg", [
@@ -71,13 +76,13 @@ const encode = () => {
             "-crf", program["v:quality"],
             ...optionalParams,
             "-vsync", "2",
-            "-tune", "zerolatency",
+            "-tune", program["v:tune"],
             "-movflags", "+faststart",
             outputFileName,
         ]);
         console.info(colors.green(ff.spawnargs.join(" ")));
         let lastError = "";
-        ff.stdout.on("data", data => console.log(String(data)));
+        ff.stdout.on("data", data => console.info(String(data)));
         ff.stderr.on("data", data => {
             lastError = String(data);
             console.error(lastError);
@@ -105,7 +110,7 @@ const getModifiedDate = () => {
                 return;
             }
             resolve(stdout);
-        })
+        });
     });
 };
 
@@ -117,7 +122,7 @@ const setModifiedDate = (file, newDate) => {
                 return;
             }
             resolve(stdout);
-        })
+        });
     });
 };
 
@@ -129,15 +134,15 @@ const fixDate = async () => {
 const sizeDiff = async () => {
     const oldFile = await fs.stat(program.input);
     const newFile = await fs.stat(outputFileName);
-    const sizeDiff = oldFile.size - newFile.size;
+    const diff = oldFile.size - newFile.size;
     console.info("");
     console.info(`Old file size: ${pretty(oldFile.size)}`);
     console.info(`New file size: ${pretty(newFile.size)}`);
-    if (sizeDiff > 0) {
-        console.info("You have saved", pretty(sizeDiff));
+    if (diff > 0) {
+        console.info("You have saved", pretty(diff));
     }
-    else if (sizeDiff < 0) {
-        console.info("New file is larger by", pretty(-sizeDiff));
+    else if (diff < 0) {
+        console.info("New file is larger by", pretty(-diff));
     }
     else {
         console.info("File sizes are exactly the same! Amazing!");
@@ -148,13 +153,13 @@ const sizeDiff = async () => {
     try {
         await encode();
         await fixDate();
-        await sizeDiff()
-        console.info("");;
+        await sizeDiff();
+        console.info("");
         console.info("Success!");
     }
     catch (e) {
-        console.info("");
-        console.error("Error happend");
+        console.error("");
+        console.error("Error happened");
         console.error(e);
     }
 })();

@@ -1,10 +1,19 @@
-const program = require('commander');
-const fs = require("fs");
-const createError = require("better-custom-error/dist").default;
+/* eslint-disable no-process-exit */
+
+import program from "commander";
+import fs from "fs";
+import createError from "better-custom-error";
+import { join } from "path";
+
+import __dirname from "./dirname.mjs";
+
+const DEFAULT_QUALITY = 23;
 
 const ArgumentError = createError("ArgumentError");
 
-const packageJson = require("../package.json");
+// @TODO deal with that ⬇
+// eslint-disable-next-line no-sync
+const packageJson = JSON.parse(String(fs.readFileSync(join(__dirname, "..", "package.json"))));
 
 const number = (value) => {
     return parseInt(value, 10);
@@ -19,9 +28,9 @@ const kbps = (value) => {
 };
 
 const rotateMap = {
-    90: "transpose=1",
-    180: ["transpose=2", "transpose=2"],
-    270: "transpose=2",
+    "90": "transpose=1",
+    "180": ["transpose=2", "transpose=2"],
+    "270": "transpose=2",
     "-90": "transpose=2",
 };
 
@@ -35,24 +44,24 @@ const rotate = (value) => {
 
 const filePath = (value) => {
     try {
-        fs.accessSync(value);
+        fs.accessSync(value); // eslint-disable-line no-sync
         return value;
     }
-    catch (e) {
+    catch (e) { // eslint-disable-line no-unused-vars
         throw new ArgumentError(`File ${value} doesn't exist or is inaccessible.`);
     }
 };
 
-module.exports = () => {
+const cmd = () => { // eslint-disable-line max-statements, max-lines-per-function
     try {
-        program.version(packageJson.version, '-v, --version')
+        program.version(packageJson.version, "-v, --version")
             .arguments("<file>")
             .option("-i, --input <path>", "source file to encode", filePath)
             .option(
                 "--v:quality <number>",
                 "sets video quality (0-51, where 0 is lossless, 17 is visually lossless, 23 is optimal default)",
                 number,
-                23,
+                DEFAULT_QUALITY,
             )
             .option(
                 "--v:fps <number>",
@@ -73,6 +82,11 @@ module.exports = () => {
                 "sets video encoding preset", // @todo list presets as validation
                 "slow",
             )
+            .option(
+                "--v:tune <tune>",
+                "sets video tune preset", // @todo list presets as validation
+                "film",
+            )
             .option("--a:copy", "copies source audio")
             .option("--a:none", "disables audio")
             .option("--a:channels <number>", "sets audio channels count", number)
@@ -89,8 +103,7 @@ module.exports = () => {
                 "--to <string>",
                 "cuts video to this time",
             )
-            .parse(process.argv)
-        ;
+            .parse(process.argv);
     }
     catch (e) {
         if (e instanceof ArgumentError) {
@@ -128,3 +141,5 @@ module.exports = () => {
 
     return program;
 };
+
+export default cmd;
