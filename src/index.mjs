@@ -66,6 +66,14 @@ const buildOptionalParams = () => { // eslint-disable-line max-statements
 
 const encode = () => {
     const optionalParams = buildOptionalParams();
+    const meta = program.meta
+        ? [
+            "-map_metadata", "0",
+            "-movflags", "use_metadata_tags",
+        ]
+        : [];
+
+    const overwrite = program.overwrite ? ["-y"] : [];
 
     return new Promise((resolve, reject) => {
         const ff = spawn("ffmpeg", [
@@ -78,6 +86,8 @@ const encode = () => {
             "-vsync", "2",
             "-tune", program["v:tune"],
             "-movflags", "+faststart",
+            ...meta,
+            ...overwrite,
             outputFileName,
         ]);
         console.info(colors.green(ff.spawnargs.join(" ")));

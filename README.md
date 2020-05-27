@@ -1,5 +1,6 @@
+Private use ffmpeg wrapper.
+
 @TODO
 
 - fps set
-- fps probing [?]
 - audio copy

@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [UNRELEASED]
 (nothing yet)
 
+## [2.1.0] - 2020-05-15
+### Added
+- metadata copied by default
+- `--no-meta` switch
+- `--overwrite` switch
+### Changed
+- quality is now 25 by default
+
 ## [2.0.0] - 2020-05-15
 ### Added
 - tune is now configurable

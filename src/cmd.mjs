@@ -7,7 +7,9 @@ import { join } from "path";
 
 import __dirname from "./dirname.mjs";
 
-const DEFAULT_QUALITY = 23;
+const DEFAULT_QUALITY = 25;
+const DEFAULT_PRESET = "slow";
+const DEFAULT_TUNE = "film";
 
 const ArgumentError = createError("ArgumentError");
 
@@ -55,7 +57,6 @@ const filePath = (value) => {
 const cmd = () => { // eslint-disable-line max-statements, max-lines-per-function
     try {
         program.version(packageJson.version, "-v, --version")
-            .arguments("<file>")
             .option("-i, --input <path>", "source file to encode", filePath)
             .option(
                 "--v:quality <number>",
@@ -80,12 +81,12 @@ const cmd = () => { // eslint-disable-line max-statements, max-lines-per-functio
             .option(
                 "--v:preset <preset>",
                 "sets video encoding preset", // @todo list presets as validation
-                "slow",
+                DEFAULT_PRESET,
             )
             .option(
                 "--v:tune <tune>",
                 "sets video tune preset", // @todo list presets as validation
-                "film",
+                DEFAULT_TUNE,
             )
             .option("--a:copy", "copies source audio")
             .option("--a:none", "disables audio")
@@ -103,6 +104,8 @@ const cmd = () => { // eslint-disable-line max-statements, max-lines-per-functio
                 "--to <string>",
                 "cuts video to this time",
             )
+            .option("--no-meta", "skips metadata copying")
+            .option("-y, --overwrite", "overwrites encoded file if already exists")
             .parse(process.argv);
     }
     catch (e) {
